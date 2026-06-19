@@ -26,11 +26,25 @@ fn run_git(args: &[&str]) {
     }
 }
 
+fn has_changes() -> bool {
+    let output = Command::new("git")
+        .args(["status", "--porcelain"])
+        .output()
+        .expect("failed to run git status");
+
+    !output.stdout.is_empty()
+}
+
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Commit { message } => {
+            if !has_changes() {
+                println!("No changes to commit");
+                return;
+            }
+
             run_git(&["add", "."]);
             run_git(&["commit", "-m", &message]);
             run_git(&["push"]);
