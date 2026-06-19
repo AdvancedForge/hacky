@@ -11,13 +11,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact: devagent-linux-x86_64
+            artifact: hacky-linux-x86_64
 
           - os: windows-latest
-            artifact: devagent-windows-x86_64.exe
+            artifact: hacky-windows-x86_64.exe
 
           - os: macos-latest
-            artifact: devagent-macos-arm64
+            artifact: hacky-macos-arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -35,7 +35,7 @@ jobs:
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             cp target/release/*.exe dist/${{ matrix.artifact }}
           else
-            cp target/release/devagent dist/${{ matrix.artifact }}
+            cp target/release/hacky dist/${{ matrix.artifact }}
           fi
 
       - uses: actions/upload-artifact@v4
