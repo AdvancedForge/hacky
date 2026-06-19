@@ -5,6 +5,12 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
+env:
+  BINARY_NAME: hacky
+
 jobs:
   build:
     strategy:
@@ -28,17 +34,17 @@ jobs:
 
       - run: cargo build --release
 
-      - name: Rename artifact
+      - name: Package artifact
         shell: bash
         run: |
           mkdir dist
+
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            cp target/release/*.exe dist/${{ matrix.artifact }}
+            cp target/release/${BINARY_NAME}.exe dist/${{ matrix.artifact }}
           else
-            cp target/release/hacky dist/${{ matrix.artifact }}
+            cp target/release/${BINARY_NAME} dist/${{ matrix.artifact }}
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: softprops/action-gh-release@v2
         with:
-          name: ${{ matrix.artifact }}
-          path: dist/*
+          files: dist/*
