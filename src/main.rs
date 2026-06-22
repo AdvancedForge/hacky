@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use std::process::{exit, Command};
 
 #[derive(Parser)]
@@ -13,7 +13,21 @@ enum Commands {
     Commit {
         message: String,
     },
-    Uncommit,
+
+    Uncommit(UncommitArgs),
+}
+
+#[derive(Args)]
+#[group(multiple = false)]
+struct UncommitArgs {
+    #[arg(long)]
+    soft: bool,
+
+    #[arg(long)]
+    hard: bool,
+
+    #[arg(long)]
+    push: bool,
 }
 
 fn run_git(args: &[&str]) {
@@ -51,8 +65,20 @@ fn main() {
             run_git(&["push"]);
         }
 
-        Commands::Uncommit => {
-            run_git(&["reset", "HEAD~1"]);
+        Commands::Uncommit(args) => {
+            let reset_mode = if args.soft {
+                "--soft"
+            } else if args.hard {
+                "--hard"
+            } else {
+                "--mixed"
+            };
+
+            run_git(&["reset", reset_mode, "HEAD~1"]);
+
+            if args.push {
+                run_git(&["push", "--force-with-lease"]);
+            }
         }
     }
 }
