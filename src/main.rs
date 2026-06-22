@@ -13,6 +13,7 @@ enum Commands {
     Commit {
         message: String,
     },
+    Uncommit,
 }
 
 fn run_git(args: &[&str]) {
@@ -48,6 +49,10 @@ fn main() {
             run_git(&["add", "."]);
             run_git(&["commit", "-m", &message]);
             run_git(&["push"]);
+        }
+
+        Commands::Uncommit => {
+            run_git(&["reset", "HEAD~1"]);
         }
     }
 }
