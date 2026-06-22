@@ -10,23 +10,26 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    #[command(about = "Runs Git add ., commit -m, and push")]
     Commit {
+        #[arg(help = "Commit message")]
         message: String,
     },
 
+    #[command(about = "Undo the most recent commit")]
     Uncommit(UncommitArgs),
 }
 
 #[derive(Args)]
 #[group(multiple = false)]
 struct UncommitArgs {
-    #[arg(long)]
+    #[arg(long, help = "Reset commit, but keep changes staged (reset --soft)")]
     soft: bool,
 
-    #[arg(long)]
+    #[arg(long, help = "Discard all changes from the last commit (reset --hard)")]
     hard: bool,
 
-    #[arg(long)]
+    #[arg(long, help = "Force-push the rewritten history (push --force-with-lease)")]
     push: bool,
 }
 
