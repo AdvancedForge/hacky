@@ -18,6 +18,9 @@ enum Commands {
 
     #[command(about = "Undo the most recent commit")]
     Uncommit(UncommitArgs),
+
+    #[command(about = "Amend the most recent commit")]
+    Amend(AmendArgs),
 }
 
 #[derive(Args)]
@@ -30,6 +33,15 @@ struct UncommitArgs {
     hard: bool,
 
     #[arg(long, help = "Force-push the rewritten history (push --force-with-lease)")]
+    push: bool,
+}
+
+#[derive(Args)]
+struct AmendArgs {
+    #[arg(help = "New commit message")]
+    message: Option<String>,
+
+    #[arg(long, help = "Force-push the amended commit (push --force-with-lease)")]
     push: bool,
 }
 
@@ -78,6 +90,20 @@ fn main() {
             };
 
             run_git(&["reset", reset_mode, "HEAD~1"]);
+
+            if args.push {
+                run_git(&["push", "--force-with-lease"]);
+            }
+        }
+
+        Commands::Amend(args) => {
+            run_git(&["add", "."]);
+
+            if let Some(message) = args.message {
+                run_git(&["commit", "--amend", "-m", &message]);
+            } else {
+                run_git(&["commit", "--amend", "--no-edit"]);
+            }
 
             if args.push {
                 run_git(&["push", "--force-with-lease"]);
