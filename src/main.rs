@@ -14,6 +14,9 @@ enum Commands {
     Commit {
         #[arg(help = "Commit message")]
         message: String,
+
+        #[arg(long, help = "Do not push after committing")]
+        no_push: bool,
     },
 
     #[command(about = "Undo the most recent commit")]
@@ -69,7 +72,7 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Commit { message } => {
+        Commands::Commit { message, no_push } => {
             if !has_changes() {
                 println!("No changes to commit");
                 return;
@@ -77,7 +80,10 @@ fn main() {
 
             run_git(&["add", "."]);
             run_git(&["commit", "-m", &message]);
-            run_git(&["push"]);
+            
+            if !no_push {
+                run_git(&["push"]);
+            }
         }
 
         Commands::Uncommit(args) => {
